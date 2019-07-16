@@ -13,6 +13,7 @@ variables:
     CYGWIN_ROOT: $(System.Workfolder)\cygwin
     CYGWIN_CMAKE_LINK: http://cygwin.mirror.constant.com/x86_64/release/cmake/cmake-3.13.1-1.tar.xz
     CYGWIN_MIRROR: http://cygwin.mirror.constant.com
+    WINSDK_DIR: C:\Program Files (x86)\Windows Kits\10
 
 steps:
   - script: |
