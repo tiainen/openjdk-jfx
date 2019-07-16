@@ -42,6 +42,10 @@ steps:
       %CYGWIN_ROOT%\bin\bash.exe -cl "wget %CYGWIN_CMAKE_LINK% -O cmake.tar.xz"
       %CYGWIN_ROOT%\bin\bash.exe -cl "tar -xf cmake.tar.xz -C /"
     displayName: Manually install CMake 3.13.1
+  - script: |
+      set BOOST_ROOT=
+      set PATH=%CYGWIN_ROOT%\bin;%SYSTEMROOT%\system32
+      gradlew.bat tasks
   - task: Gradle@2
     inputs:
       workingDirectory: ''
