@@ -280,7 +280,7 @@ String TextCodecUTF8::decode(const char* bytes, size_t length, bool flush, bool 
     // That includes all bytes in the partial-sequence buffer because
     // each byte in an invalid sequence will turn into a replacement character.
     fprintf(stderr, "[JSY] 0\n");
-    fprintf(stderr, "[JSY] 1; bytes = %s, length = %d\n", bytes, length);
+    fprintf(stderr, "[JSY] 1; length = %d\n", length);
     StringBuffer<LChar> buffer(m_partialSequenceSize + length);
 
     const uint8_t* source = reinterpret_cast<const uint8_t*>(bytes);
