@@ -303,9 +303,10 @@ String TextCodecUTF8::decode(const char* bytes, size_t length, bool flush, bool 
             }
             destination = destinationForHandlePartialSequence;
             source = sourceForHandlePartialSequence;
-            if (m_partialSequenceSize)
+            if (m_partialSequenceSize) {
                 fprintf(stderr, "[JSY] 2b\n");
                 break;
+            }
         }
 
         fprintf(stderr, "[JSY] 3\n");
@@ -324,11 +325,15 @@ String TextCodecUTF8::decode(const char* bytes, size_t length, bool flush, bool 
                         destination += sizeof(WTF::MachineWord);
                     }
                     fprintf(stderr, "[JSY] 3ab\n");
-                    if (source == end)
+                    if (source == end) {
+                        fprintf(stderr, "[JSY] 3ac\n");
                         break;
-                    fprintf(stderr, "[JSY] 3ac\n");
-                    if (!isASCII(*source))
+                    }
+                    fprintf(stderr, "[JSY] 3ad\n");
+                    if (!isASCII(*source)) {
+                        fprintf(stderr, "[JSY] 3ae\n");
                         continue;
+                    }
                 }
                 fprintf(stderr, "[JSY] 3b\n");
                 *destination++ = *source++;
@@ -337,9 +342,10 @@ String TextCodecUTF8::decode(const char* bytes, size_t length, bool flush, bool 
             fprintf(stderr, "[JSY] 3c\n");
             int count = nonASCIISequenceLength(*source);
             int character;
-            if (!count)
+            if (!count) {
+                fprintf(stderr, "[JSY] 3ca\n");
                 character = nonCharacter;
-            else {
+            } else {
                 fprintf(stderr, "[JSY] 3d\n");
                 if (count > end - source) {
                     fprintf(stderr, "[JSY] 3da\n");
@@ -360,20 +366,24 @@ String TextCodecUTF8::decode(const char* bytes, size_t length, bool flush, bool 
             if (character == nonCharacter) {
                 fprintf(stderr, "[JSY] 3h\n");
                 sawError = true;
-                if (stopOnError)
+                if (stopOnError) {
+                    fprintf(stderr, "[JSY] 3i\n");
                     break;
+                }
 
+                fprintf(stderr, "[JSY] 3j\n");
                 goto upConvertTo16Bit;
             }
             if (character > 0xFF) {
-                fprintf(stderr, "[JSY] 3i\n");
+                fprintf(stderr, "[JSY] 3k\n");
                 goto upConvertTo16Bit;
             }
 
-            fprintf(stderr, "[JSY] 3j\n");
+            fprintf(stderr, "[JSY] 3l\n");
             source += count;
-            fprintf(stderr, "[JSY] 3k\n");
+            fprintf(stderr, "[JSY] 3m\n");
             *destination++ = character;
+            fprintf(stderr, "[JSY] 3n\n");
         }
     } while (flush && m_partialSequenceSize);
 
@@ -407,9 +417,10 @@ upConvertTo16Bit:
             fprintf(stderr, "[JSY] E\n");
             destination16 = destinationForHandlePartialSequence;
             source = sourceForHandlePartialSequence;
-            if (m_partialSequenceSize)
+            if (m_partialSequenceSize) {
                 fprintf(stderr, "[JSY] F\n");
                 break;
+            }
         }
 
         fprintf(stderr, "[JSY] G\n");
@@ -421,32 +432,37 @@ upConvertTo16Bit:
                     fprintf(stderr, "[JSY] Gb\n");
                     while (source < alignedEnd) {
                         auto chunk = *reinterpret_cast_ptr<const WTF::MachineWord*>(source);
-                        if (!WTF::isAllASCII<LChar>(chunk))
+                        if (!WTF::isAllASCII<LChar>(chunk)) {
                             fprintf(stderr, "[JSY] Gc\n");
                             break;
+                        }
                         copyASCIIMachineWord(destination16, source);
                         source += sizeof(WTF::MachineWord);
                         destination16 += sizeof(WTF::MachineWord);
                     }
                     fprintf(stderr, "[JSY] Gd\n");
-                    if (source == end)
+                    if (source == end) {
                         fprintf(stderr, "[JSY] Ge\n");
                         break;
+                    }
                     fprintf(stderr, "[JSY] Gf\n");
-                    if (!isASCII(*source))
+                    if (!isASCII(*source)) {
                         fprintf(stderr, "[JSY] Gh\n");
                         continue;
+                    }
                 }
                 fprintf(stderr, "[JSY] Gi\n");
                 *destination16++ = *source++;
+                fprintf(stderr, "[JSY] Gj\n");
                 continue;
             }
             fprintf(stderr, "[JSY] H\n");
             int count = nonASCIISequenceLength(*source);
             int character;
-            if (!count)
+            if (!count) {
+                fprintf(stderr, "[JSY] H1\n");
                 character = nonCharacter;
-            else {
+            } else {
                 fprintf(stderr, "[JSY] I\n");
                 if (count > end - source) {
                     fprintf(stderr, "[JSY] I1\n");
@@ -469,11 +485,15 @@ upConvertTo16Bit:
             if (character == nonCharacter) {
                 fprintf(stderr, "[JSY] L1\n");
                 sawError = true;
-                if (stopOnError)
+                if (stopOnError) {
                     fprintf(stderr, "[JSY] L2\n");
                     break;
+                }
+                fprintf(stderr, "[JSY] L3\n");
                 *destination16++ = replacementCharacter;
+                fprintf(stderr, "[JSY] L4\n");
                 source += count ? count : 1;
+                fprintf(stderr, "[JSY] L5\n");
                 continue;
             }
             fprintf(stderr, "[JSY] M\n");
