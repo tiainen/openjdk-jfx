@@ -77,7 +77,9 @@ StringView CachedScript::script()
         return { reinterpret_cast<const LChar*>(m_data->data()), static_cast<unsigned>(m_data->size()) };
 
     if (!m_script) {
+        fprintf(stderr, "[JSY] CachedScript: A\n", m_scriptHash);
         m_script = m_decoder->decodeAndFlush(m_data->data(), encodedSize());
+        fprintf(stderr, "[JSY] CachedScript: B; %d / %d\n", m_scriptHash, m_script.impl()->hash());
         ASSERT(!m_scriptHash || m_scriptHash == m_script.impl()->hash());
         if (m_decodingState == NeverDecoded)
             m_scriptHash = m_script.impl()->hash();
