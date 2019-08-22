@@ -426,87 +426,89 @@ upConvertTo16Bit:
         fprintf(stderr, "[JSY] G\n");
         while (source < end) {
             if (isASCII(*source)) {
-                fprintf(stderr, "[JSY] Ga\n");
+//                fprintf(stderr, "[JSY] Ga\n");
                 // Fast path for ASCII. Most UTF-8 text will be ASCII.
                 if (WTF::isAlignedToMachineWord(source)) {
-                    fprintf(stderr, "[JSY] Gb\n");
+//                    fprintf(stderr, "[JSY] Gb\n");
                     while (source < alignedEnd) {
                         auto chunk = *reinterpret_cast_ptr<const WTF::MachineWord*>(source);
                         if (!WTF::isAllASCII<LChar>(chunk)) {
-                            fprintf(stderr, "[JSY] Gc\n");
+//                            fprintf(stderr, "[JSY] Gc\n");
                             break;
                         }
                         copyASCIIMachineWord(destination16, source);
                         source += sizeof(WTF::MachineWord);
                         destination16 += sizeof(WTF::MachineWord);
                     }
-                    fprintf(stderr, "[JSY] Gd\n");
+//                    fprintf(stderr, "[JSY] Gd\n");
                     if (source == end) {
                         fprintf(stderr, "[JSY] Ge\n");
                         break;
                     }
-                    fprintf(stderr, "[JSY] Gf\n");
+//                    fprintf(stderr, "[JSY] Gf\n");
                     if (!isASCII(*source)) {
                         fprintf(stderr, "[JSY] Gh\n");
                         continue;
                     }
                 }
-                fprintf(stderr, "[JSY] Gi\n");
+//                fprintf(stderr, "[JSY] Gi\n");
                 *destination16++ = *source++;
-                fprintf(stderr, "[JSY] Gj\n");
+//                fprintf(stderr, "[JSY] Gj\n");
                 continue;
             }
-            fprintf(stderr, "[JSY] H\n");
+//            fprintf(stderr, "[JSY] H\n");
             int count = nonASCIISequenceLength(*source);
             int character;
             if (!count) {
-                fprintf(stderr, "[JSY] H1\n");
+//                fprintf(stderr, "[JSY] H1\n");
                 character = nonCharacter;
             } else {
-                fprintf(stderr, "[JSY] I\n");
+//                fprintf(stderr, "[JSY] I\n");
                 if (count > end - source) {
-                    fprintf(stderr, "[JSY] I1\n");
+//                    fprintf(stderr, "[JSY] I1\n");
                     ASSERT_WITH_SECURITY_IMPLICATION(end - source < static_cast<ptrdiff_t>(sizeof(m_partialSequence)));
-                    fprintf(stderr, "[JSY] I2\n");
+//                    fprintf(stderr, "[JSY] I2\n");
                     ASSERT(!m_partialSequenceSize);
-                    fprintf(stderr, "[JSY] I3\n");
+//                    fprintf(stderr, "[JSY] I3\n");
                     m_partialSequenceSize = end - source;
-                    fprintf(stderr, "[JSY] I4\n");
+//                    fprintf(stderr, "[JSY] I4\n");
                     memcpy(m_partialSequence, source, m_partialSequenceSize);
-                    fprintf(stderr, "[JSY] I5\n");
+//                    fprintf(stderr, "[JSY] I5\n");
                     source = end;
                     break;
                 }
-                fprintf(stderr, "[JSY] J\n");
+//                fprintf(stderr, "[JSY] J\n");
                 character = decodeNonASCIISequence(source, count);
-                fprintf(stderr, "[JSY] K\n");
+//                fprintf(stderr, "[JSY] K\n");
             }
-            fprintf(stderr, "[JSY] L\n");
+//            fprintf(stderr, "[JSY] L\n");
             if (character == nonCharacter) {
-                fprintf(stderr, "[JSY] L1\n");
+//                fprintf(stderr, "[JSY] L1\n");
                 sawError = true;
                 if (stopOnError) {
-                    fprintf(stderr, "[JSY] L2\n");
+//                    fprintf(stderr, "[JSY] L2\n");
                     break;
                 }
-                fprintf(stderr, "[JSY] L3\n");
+//                fprintf(stderr, "[JSY] L3\n");
                 *destination16++ = replacementCharacter;
-                fprintf(stderr, "[JSY] L4\n");
+//                fprintf(stderr, "[JSY] L4\n");
                 source += count ? count : 1;
-                fprintf(stderr, "[JSY] L5\n");
+//                fprintf(stderr, "[JSY] L5\n");
                 continue;
             }
-            fprintf(stderr, "[JSY] M\n");
+//            fprintf(stderr, "[JSY] M\n");
             source += count;
-            fprintf(stderr, "[JSY] N\n");
+//            fprintf(stderr, "[JSY] N\n");
             destination16 = appendCharacter(destination16, character);
         }
+
+        fprintf(stderr, "[JSY] O\n");
     } while (flush && m_partialSequenceSize);
 
-    fprintf(stderr, "[JSY] O\n");
+    fprintf(stderr, "[JSY] P\n");
     buffer16.shrink(destination16 - buffer16.characters());
 
-    fprintf(stderr, "[JSY] P\n");
+    fprintf(stderr, "[JSY] Q\n");
     return String::adopt(WTFMove(buffer16));
 }
 
