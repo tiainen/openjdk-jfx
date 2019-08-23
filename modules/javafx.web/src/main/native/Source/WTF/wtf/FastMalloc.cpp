@@ -186,7 +186,10 @@ void* fastMalloc(size_t n)
     ASSERT_IS_WITHIN_LIMIT(n);
     void* result = malloc(n);
     if (!result)
+    {
+        fprintf(stderr, "CRASHING from FastMalloc.cpp:191\n");
         CRASH();
+    }
 
     return result;
 }
