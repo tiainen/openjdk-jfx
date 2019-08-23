@@ -789,12 +789,12 @@ String TextResourceDecoder::decodeAndFlush(const char *data, size_t length)
     fprintf(stderr, "[JSY] 2 TextResourceDecoder::decodeAndFlush(): end decode, begin flush\n");
     String flushed = flush();
     fprintf(stderr, "[JSY] 3 TextResourceDecoder::decodeAndFlush(): end flush, combining decoded and flushed\n");
-    fprintf(stderr, "[JSY] 4 %p\n", decoded);
-    fprintf(stderr, "[JSY] 5 %p\n", flushed);
-    fprintf(stderr, "[JSY] 6 %d\n", decoded ? decoded.length() : -1);
-    fprintf(stderr, "[JSY] 7 %d\n", flushed ? flushed.length() : -1);
+    fprintf(stderr, "[JSY] 4 %p at %p\n", decoded, &decoded);
+    fprintf(stderr, "[JSY] 5 %p at %p\n", flushed, &flushed);
+    fprintf(stderr, "[JSY] 6 %d\n", decoded.length());
+    fprintf(stderr, "[JSY] 7 %d\n", flushed.length());
     String full = decoded + flushed;
-    fprintf(stderr, "[JSY] 8 %p\n", full);
+    fprintf(stderr, "[JSY] 8 %p at %p\n", full, &full);
     fprintf(stderr, "[JSY] 9 TextResourceDecoder::decodeAndFlush(): returning combined string\n");
     return full;
     //    return decoded + flush();
