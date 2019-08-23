@@ -391,7 +391,12 @@ String TextCodecUTF8::decode(const char* bytes, size_t length, bool flush, bool 
     buffer.shrink(destination - buffer.characters());
 
     fprintf(stderr, "[JSY] 5\n");
-    return String::adopt(WTFMove(buffer));
+    {
+      String adopted = String::adopt(WTFMove(buffer));
+      fprintf(stderr, "[JSY] 6\n");
+      return adopted;
+//      return String::adopt(WTFMove(buffer));
+    }
 
 upConvertTo16Bit:
     StringBuffer<UChar> buffer16(m_partialSequenceSize + length);
@@ -442,12 +447,12 @@ upConvertTo16Bit:
                     }
 //                    fprintf(stderr, "[JSY] Gd\n");
                     if (source == end) {
-                        fprintf(stderr, "[JSY] Ge\n");
+//                        fprintf(stderr, "[JSY] Ge\n");
                         break;
                     }
 //                    fprintf(stderr, "[JSY] Gf\n");
                     if (!isASCII(*source)) {
-                        fprintf(stderr, "[JSY] Gh\n");
+//                        fprintf(stderr, "[JSY] Gh\n");
                         continue;
                     }
                 }
