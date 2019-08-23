@@ -669,89 +669,86 @@ bool TextResourceDecoder::shouldAutoDetect() const
 
 String TextResourceDecoder::decode(const char *data, size_t length)
 {
-    fprintf(stderr, "[JSY] TextResourceDecoder::decode() A");
+    fprintf(stderr, "[JSY] TextResourceDecoder::decode() A\n");
     size_t lengthOfBOM = 0;
     if (!m_checkedForBOM)
-    {
-        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Aa");
         lengthOfBOM = checkForBOM(data, length);
-    }
 
-    fprintf(stderr, "[JSY] TextResourceDecoder::decode() B");
+    fprintf(stderr, "[JSY] TextResourceDecoder::decode() B\n");
     bool movedDataToBuffer = false;
 
     if (m_contentType == CSS && !m_checkedForCSSCharset)
         if (!checkForCSSCharset(data, length, movedDataToBuffer))
         {
-            fprintf(stderr, "[JSY] TextResourceDecoder::decode() C, returning empty string");
+            fprintf(stderr, "[JSY] TextResourceDecoder::decode() C, returning empty string\n");
             return emptyString();
         }
 
     if ((m_contentType == HTML || m_contentType == XML) && !m_checkedForHeadCharset) // HTML and XML
         if (!checkForHeadCharset(data, length, movedDataToBuffer))
         {
-            fprintf(stderr, "[JSY] TextResourceDecoder::decode() D, returning empty string");
+            fprintf(stderr, "[JSY] TextResourceDecoder::decode() D, returning empty string\n");
             return emptyString();
         }
 
-    fprintf(stderr, "[JSY] TextResourceDecoder::decode() E");
+    fprintf(stderr, "[JSY] TextResourceDecoder::decode() E\n");
 
     // FIXME: It is wrong to change the encoding downstream after we have already done some decoding.
     if (shouldAutoDetect())
     {
-        fprintf(stderr, "[JSY] TextResourceDecoder::decode() F");
+        fprintf(stderr, "[JSY] TextResourceDecoder::decode() F\n");
         if (m_encoding.isJapanese())
         {
-            fprintf(stderr, "[JSY] TextResourceDecoder::decode() G");
+            fprintf(stderr, "[JSY] TextResourceDecoder::decode() G\n");
             detectJapaneseEncoding(data, length); // FIXME: We should use detectTextEncoding() for all languages.
         }
         else
         {
-            fprintf(stderr, "[JSY] TextResourceDecoder::decode() H");
+            fprintf(stderr, "[JSY] TextResourceDecoder::decode() H\n");
             TextEncoding detectedEncoding;
             if (detectTextEncoding(data, length, m_parentFrameAutoDetectedEncoding, &detectedEncoding))
             {
-                fprintf(stderr, "[JSY] TextResourceDecoder::decode() I");
+                fprintf(stderr, "[JSY] TextResourceDecoder::decode() I\n");
                 setEncoding(detectedEncoding, AutoDetectedEncoding);
             }
-            fprintf(stderr, "[JSY] TextResourceDecoder::decode() J");
+            fprintf(stderr, "[JSY] TextResourceDecoder::decode() J\n");
         }
     }
 
     ASSERT(m_encoding.isValid());
 
-    fprintf(stderr, "[JSY] TextResourceDecoder::decode() K");
+    fprintf(stderr, "[JSY] TextResourceDecoder::decode() K\n");
     if (!m_codec)
     {
-        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Ka");
+        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Ka\n");
         m_codec = newTextCodec(m_encoding);
-        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Kb");
+        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Kb\n");
     }
 
-    fprintf(stderr, "[JSY] TextResourceDecoder::decode() L");
+    fprintf(stderr, "[JSY] TextResourceDecoder::decode() L\n");
     if (m_buffer.isEmpty())
     {
-        fprintf(stderr, "[JSY] TextResourceDecoder::decode() La");
+        fprintf(stderr, "[JSY] TextResourceDecoder::decode() La\n");
         return m_codec->decode(data + lengthOfBOM, length - lengthOfBOM, false, m_contentType == XML, m_sawError);
     }
 
-    fprintf(stderr, "[JSY] TextResourceDecoder::decode() M");
+    fprintf(stderr, "[JSY] TextResourceDecoder::decode() M\n");
     if (!movedDataToBuffer)
     {
-        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Ma");
+        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Ma\n");
         size_t oldSize = m_buffer.size();
-        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Mb");
+        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Mb\n");
         m_buffer.grow(oldSize + length);
-        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Mc");
+        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Mc\n");
         memcpy(m_buffer.data() + oldSize, data, length);
-        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Md");
+        fprintf(stderr, "[JSY] TextResourceDecoder::decode() Md\n");
     }
 
-    fprintf(stderr, "[JSY] TextResourceDecoder::decode() N");
+    fprintf(stderr, "[JSY] TextResourceDecoder::decode() N\n");
     String result = m_codec->decode(m_buffer.data() + lengthOfBOM, m_buffer.size() - lengthOfBOM, false, m_contentType == XML && !m_useLenientXMLDecoding, m_sawError);
-    fprintf(stderr, "[JSY] TextResourceDecoder::decode() O");
+    fprintf(stderr, "[JSY] TextResourceDecoder::decode() O\n");
     m_buffer.clear();
-    fprintf(stderr, "[JSY] TextResourceDecoder::decode() P");
+    fprintf(stderr, "[JSY] TextResourceDecoder::decode() P\n");
     return result;
 }
 
@@ -760,38 +757,46 @@ String TextResourceDecoder::flush()
     // If we can not identify the encoding even after a document is completely
     // loaded, we need to detect the encoding if other conditions for
     // autodetection is satisfied.
-    fprintf(stderr, "[JSY] TextResourceDecoder::flush() A");
+    fprintf(stderr, "[JSY] TextResourceDecoder::flush() A\n");
     if (m_buffer.size() && shouldAutoDetect() && ((!m_checkedForHeadCharset && (m_contentType == HTML || m_contentType == XML)) || (!m_checkedForCSSCharset && (m_contentType == CSS))))
     {
         TextEncoding detectedEncoding;
         if (detectTextEncoding(m_buffer.data(), m_buffer.size(), m_parentFrameAutoDetectedEncoding, &detectedEncoding))
             setEncoding(detectedEncoding, AutoDetectedEncoding);
     }
-    fprintf(stderr, "[JSY] TextResourceDecoder::flush() B");
+    fprintf(stderr, "[JSY] TextResourceDecoder::flush() B\n");
 
     if (!m_codec)
         m_codec = newTextCodec(m_encoding);
 
-    fprintf(stderr, "[JSY] TextResourceDecoder::flush() C");
+    fprintf(stderr, "[JSY] TextResourceDecoder::flush() C\n");
     String result = m_codec->decode(m_buffer.data(), m_buffer.size(), true, m_contentType == XML && !m_useLenientXMLDecoding, m_sawError);
-    fprintf(stderr, "[JSY] TextResourceDecoder::flush() D");
+    fprintf(stderr, "[JSY] TextResourceDecoder::flush() D\n");
     m_buffer.clear();
-    fprintf(stderr, "[JSY] TextResourceDecoder::flush() E");
+    fprintf(stderr, "[JSY] TextResourceDecoder::flush() E\n");
     m_codec = nullptr;
-    fprintf(stderr, "[JSY] TextResourceDecoder::flush() F");
+    fprintf(stderr, "[JSY] TextResourceDecoder::flush() F\n");
     m_checkedForBOM = false; // Skip BOM again when re-decoding.
-    fprintf(stderr, "[JSY] TextResourceDecoder::flush() G");
+    fprintf(stderr, "[JSY] TextResourceDecoder::flush() G\n");
     return result;
 }
 
 String TextResourceDecoder::decodeAndFlush(const char *data, size_t length)
 {
-    fprintf(stderr, "[JSY] 1 TextResourceDecoder::decodeAndFlush(): begin decode");
+    fprintf(stderr, "[JSY] 0 data: %s; length: %d\n", data, length);
+    fprintf(stderr, "[JSY] 1 TextResourceDecoder::decodeAndFlush(): begin decode\n");
     String decoded = decode(data, length);
-    fprintf(stderr, "[JSY] 2 TextResourceDecoder::decodeAndFlush(): end decode, begin flush");
+    fprintf(stderr, "[JSY] 2 TextResourceDecoder::decodeAndFlush(): end decode, begin flush\n");
     String flushed = flush();
-    fprintf(stderr, "[JSY] 3 TextResourceDecoder::decodeAndFlush(): end flush, returning");
-    return decoded + flushed;
+    fprintf(stderr, "[JSY] 3 TextResourceDecoder::decodeAndFlush(): end flush, combining decoded and flushed\n");
+    fprintf(stderr, "[JSY] 4 %p\n", decoded);
+    fprintf(stderr, "[JSY] 5 %p\n", flushed);
+    fprintf(stderr, "[JSY] 6 %d\n", decoded ? decoded.length() : -1);
+    fprintf(stderr, "[JSY] 7 %d\n", flushed ? flushed.length() : -1);
+    String full = decoded + flushed;
+    fprintf(stderr, "[JSY] 8 %p\n", full);
+    fprintf(stderr, "[JSY] 9 TextResourceDecoder::decodeAndFlush(): returning combined string\n");
+    return full;
     //    return decoded + flush();
 }
 
