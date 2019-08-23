@@ -279,8 +279,8 @@ String TextCodecUTF8::decode(const char* bytes, size_t length, bool flush, bool 
     // Each input byte might turn into a character.
     // That includes all bytes in the partial-sequence buffer because
     // each byte in an invalid sequence will turn into a replacement character.
-    fprintf(stderr, "[JSY] 0\n");
-    fprintf(stderr, "[JSY] 1; length = %d\n", length);
+    fprintf(stderr, "[JSY] TextCodecUTF8::decode 0\n");
+    fprintf(stderr, "[JSY] TextCodecUTF8::decode 1; length = %d\n", length);
     StringBuffer<LChar> buffer(m_partialSequenceSize + length);
 
     const uint8_t* source = reinterpret_cast<const uint8_t*>(bytes);
@@ -290,32 +290,32 @@ String TextCodecUTF8::decode(const char* bytes, size_t length, bool flush, bool 
 
     do {
         if (m_partialSequenceSize) {
-            fprintf(stderr, "[JSY] 2\n");
+            fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 2\n");
             // Explicitly copy destination and source pointers to avoid taking pointers to the
             // local variables, which may harm code generation by disabling some optimizations
             // in some compilers.
             LChar* destinationForHandlePartialSequence = destination;
             const uint8_t* sourceForHandlePartialSequence = source;
             if (handlePartialSequence(destinationForHandlePartialSequence, sourceForHandlePartialSequence, end, flush)) {
-                fprintf(stderr, "[JSY] 2a\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 2a\n");
                 source = sourceForHandlePartialSequence;
                 goto upConvertTo16Bit;
             }
             destination = destinationForHandlePartialSequence;
             source = sourceForHandlePartialSequence;
             if (m_partialSequenceSize) {
-                fprintf(stderr, "[JSY] 2b\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 2b\n");
                 break;
             }
         }
 
-        fprintf(stderr, "[JSY] 3\n");
+        fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3\n");
         while (source < end) {
             if (isASCII(*source)) {
-                fprintf(stderr, "[JSY] 3a\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3a\n");
                 // Fast path for ASCII. Most UTF-8 text will be ASCII.
                 if (WTF::isAlignedToMachineWord(source)) {
-                    fprintf(stderr, "[JSY] 3aa\n");
+                    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3aa\n");
                     while (source < alignedEnd) {
                         auto chunk = *reinterpret_cast_ptr<const WTF::MachineWord*>(source);
                         if (!WTF::isAllASCII<LChar>(chunk))
@@ -324,196 +324,162 @@ String TextCodecUTF8::decode(const char* bytes, size_t length, bool flush, bool 
                         source += sizeof(WTF::MachineWord);
                         destination += sizeof(WTF::MachineWord);
                     }
-                    fprintf(stderr, "[JSY] 3ab\n");
+                    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3ab\n");
                     if (source == end) {
-                        fprintf(stderr, "[JSY] 3ac\n");
+                        fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3ac\n");
                         break;
                     }
-                    fprintf(stderr, "[JSY] 3ad\n");
+                    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3ad\n");
                     if (!isASCII(*source)) {
-                        fprintf(stderr, "[JSY] 3ae\n");
+                        fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3ae\n");
                         continue;
                     }
                 }
-                fprintf(stderr, "[JSY] 3b\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3b\n");
                 *destination++ = *source++;
                 continue;
             }
-            fprintf(stderr, "[JSY] 3c\n");
+            fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3c\n");
             int count = nonASCIISequenceLength(*source);
             int character;
             if (!count) {
-                fprintf(stderr, "[JSY] 3ca\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3ca\n");
                 character = nonCharacter;
             } else {
-                fprintf(stderr, "[JSY] 3d\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3d\n");
                 if (count > end - source) {
-                    fprintf(stderr, "[JSY] 3da\n");
+                    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3da\n");
                     ASSERT_WITH_SECURITY_IMPLICATION(end - source < static_cast<ptrdiff_t>(sizeof(m_partialSequence)));
                     ASSERT(!m_partialSequenceSize);
                     m_partialSequenceSize = end - source;
-                    fprintf(stderr, "[JSY] 3db\n");
+                    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3db\n");
                     memcpy(m_partialSequence, source, m_partialSequenceSize);
-                    fprintf(stderr, "[JSY] 3dc\n");
+                    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3dc\n");
                     source = end;
                     break;
                 }
-                fprintf(stderr, "[JSY] 3e\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3e\n");
                 character = decodeNonASCIISequence(source, count);
-                fprintf(stderr, "[JSY] 3f\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3f\n");
             }
-            fprintf(stderr, "[JSY] 3g\n");
+            fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3g\n");
             if (character == nonCharacter) {
-                fprintf(stderr, "[JSY] 3h\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3h\n");
                 sawError = true;
                 if (stopOnError) {
-                    fprintf(stderr, "[JSY] 3i\n");
+                    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3i\n");
                     break;
                 }
 
-                fprintf(stderr, "[JSY] 3j\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3j\n");
                 goto upConvertTo16Bit;
             }
             if (character > 0xFF) {
-                fprintf(stderr, "[JSY] 3k\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3k\n");
                 goto upConvertTo16Bit;
             }
 
-            fprintf(stderr, "[JSY] 3l\n");
+            fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3l\n");
             source += count;
-            fprintf(stderr, "[JSY] 3m\n");
+            fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3m\n");
             *destination++ = character;
-            fprintf(stderr, "[JSY] 3n\n");
+            fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 3n\n");
         }
     } while (flush && m_partialSequenceSize);
 
-    fprintf(stderr, "[JSY] 4\n");
+    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 4\n");
     buffer.shrink(destination - buffer.characters());
 
-    fprintf(stderr, "[JSY] 5\n");
-    {
-      String adopted = String::adopt(WTFMove(buffer));
-      fprintf(stderr, "[JSY] 6\n");
-      return adopted;
-//      return String::adopt(WTFMove(buffer));
-    }
+    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo8Bit: 5\n");
+    return String::adopt(WTFMove(buffer));
 
 upConvertTo16Bit:
+    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: A\n");
     StringBuffer<UChar> buffer16(m_partialSequenceSize + length);
 
+    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: B\n");
     UChar* destination16 = buffer16.characters();
 
-    fprintf(stderr, "[JSY] A\n");
+    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: C\n");
     // Copy the already converted characters
     for (LChar* converted8 = buffer.characters(); converted8 < destination;)
         *destination16++ = *converted8++;
 
-    fprintf(stderr, "[JSY] B\n");
+    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: D\n");
     do {
         if (m_partialSequenceSize) {
-            fprintf(stderr, "[JSY] C\n");
+            fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: E\n");
             // Explicitly copy destination and source pointers to avoid taking pointers to the
             // local variables, which may harm code generation by disabling some optimizations
             // in some compilers.
             UChar* destinationForHandlePartialSequence = destination16;
             const uint8_t* sourceForHandlePartialSequence = source;
-            fprintf(stderr, "[JSY] D\n");
+            fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: F\n");
             handlePartialSequence(destinationForHandlePartialSequence, sourceForHandlePartialSequence, end, flush, stopOnError, sawError);
-            fprintf(stderr, "[JSY] E\n");
+            fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: G\n");
             destination16 = destinationForHandlePartialSequence;
             source = sourceForHandlePartialSequence;
             if (m_partialSequenceSize) {
-                fprintf(stderr, "[JSY] F\n");
+                fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: H\n");
                 break;
             }
         }
 
-        fprintf(stderr, "[JSY] G\n");
+        fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: I\n");
         while (source < end) {
             if (isASCII(*source)) {
-//                fprintf(stderr, "[JSY] Ga\n");
                 // Fast path for ASCII. Most UTF-8 text will be ASCII.
                 if (WTF::isAlignedToMachineWord(source)) {
-//                    fprintf(stderr, "[JSY] Gb\n");
                     while (source < alignedEnd) {
                         auto chunk = *reinterpret_cast_ptr<const WTF::MachineWord*>(source);
-                        if (!WTF::isAllASCII<LChar>(chunk)) {
-//                            fprintf(stderr, "[JSY] Gc\n");
+                        if (!WTF::isAllASCII<LChar>(chunk))
                             break;
-                        }
                         copyASCIIMachineWord(destination16, source);
                         source += sizeof(WTF::MachineWord);
                         destination16 += sizeof(WTF::MachineWord);
                     }
-//                    fprintf(stderr, "[JSY] Gd\n");
-                    if (source == end) {
-//                        fprintf(stderr, "[JSY] Ge\n");
+                    if (source == end)
                         break;
-                    }
-//                    fprintf(stderr, "[JSY] Gf\n");
-                    if (!isASCII(*source)) {
-//                        fprintf(stderr, "[JSY] Gh\n");
+                    if (!isASCII(*source))
                         continue;
-                    }
                 }
-//                fprintf(stderr, "[JSY] Gi\n");
                 *destination16++ = *source++;
-//                fprintf(stderr, "[JSY] Gj\n");
                 continue;
             }
-//            fprintf(stderr, "[JSY] H\n");
             int count = nonASCIISequenceLength(*source);
             int character;
-            if (!count) {
-//                fprintf(stderr, "[JSY] H1\n");
+            if (!count)
                 character = nonCharacter;
-            } else {
-//                fprintf(stderr, "[JSY] I\n");
+            else {
                 if (count > end - source) {
-//                    fprintf(stderr, "[JSY] I1\n");
                     ASSERT_WITH_SECURITY_IMPLICATION(end - source < static_cast<ptrdiff_t>(sizeof(m_partialSequence)));
-//                    fprintf(stderr, "[JSY] I2\n");
                     ASSERT(!m_partialSequenceSize);
-//                    fprintf(stderr, "[JSY] I3\n");
                     m_partialSequenceSize = end - source;
-//                    fprintf(stderr, "[JSY] I4\n");
                     memcpy(m_partialSequence, source, m_partialSequenceSize);
-//                    fprintf(stderr, "[JSY] I5\n");
                     source = end;
                     break;
                 }
-//                fprintf(stderr, "[JSY] J\n");
                 character = decodeNonASCIISequence(source, count);
-//                fprintf(stderr, "[JSY] K\n");
             }
-//            fprintf(stderr, "[JSY] L\n");
             if (character == nonCharacter) {
-//                fprintf(stderr, "[JSY] L1\n");
                 sawError = true;
-                if (stopOnError) {
-//                    fprintf(stderr, "[JSY] L2\n");
+                if (stopOnError)
                     break;
-                }
-//                fprintf(stderr, "[JSY] L3\n");
                 *destination16++ = replacementCharacter;
-//                fprintf(stderr, "[JSY] L4\n");
                 source += count ? count : 1;
-//                fprintf(stderr, "[JSY] L5\n");
                 continue;
             }
-//            fprintf(stderr, "[JSY] M\n");
             source += count;
-//            fprintf(stderr, "[JSY] N\n");
             destination16 = appendCharacter(destination16, character);
         }
 
-        fprintf(stderr, "[JSY] O\n");
+        fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: J\n");
     } while (flush && m_partialSequenceSize);
 
-    fprintf(stderr, "[JSY] P\n");
+    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: K\n");
     buffer16.shrink(destination16 - buffer16.characters());
 
-    fprintf(stderr, "[JSY] Q\n");
+    fprintf(stderr, "[JSY] TextCodecUTF8:upConvertTo16Bit: L\n");
     return String::adopt(WTFMove(buffer16));
 }
 
