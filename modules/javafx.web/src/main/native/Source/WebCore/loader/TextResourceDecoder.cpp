@@ -783,7 +783,6 @@ String TextResourceDecoder::flush()
 
 String TextResourceDecoder::decodeAndFlush(const char *data, size_t length)
 {
-    fprintf(stderr, "[JSY] 0 data: %s; length: %d\n", data, length);
     fprintf(stderr, "[JSY] 1 TextResourceDecoder::decodeAndFlush(): begin decode\n");
     String decoded = decode(data, length);
     fprintf(stderr, "[JSY] 2 TextResourceDecoder::decodeAndFlush(): end decode, begin flush\n");
