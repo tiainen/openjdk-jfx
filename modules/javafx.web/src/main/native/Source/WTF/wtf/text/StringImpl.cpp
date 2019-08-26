@@ -187,7 +187,10 @@ template<typename CharacterType> inline Ref<StringImpl> StringImpl::createUninit
     // struct as well as the data which it contains. This removes one
     // heap allocation from this call.
     if (length > ((std::numeric_limits<unsigned>::max() - sizeof(StringImpl)) / sizeof(CharacterType)))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:192, length = %d\n", length);
         CRASH();
+    }
     StringImpl* string = static_cast<StringImpl*>(fastMalloc(allocationSize<CharacterType>(length)));
 
     data = string->tailPointer<CharacterType>();
@@ -216,7 +219,10 @@ template<typename CharacterType> inline Ref<StringImpl> StringImpl::reallocateIn
 
     // Same as createUninitialized() except here we use fastRealloc.
     if (length > ((std::numeric_limits<unsigned>::max() - sizeof(StringImpl)) / sizeof(CharacterType)))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:224, length = %d\n", length);
         CRASH();
+    }
 
     originalString->~StringImpl();
     auto* string = static_cast<StringImpl*>(fastRealloc(&originalString.leakRef(), allocationSize<CharacterType>(length)));
@@ -285,7 +291,10 @@ Ref<StringImpl> StringImpl::create(const LChar* string)
         return *empty();
     size_t length = strlen(reinterpret_cast<const char*>(string));
     if (length > std::numeric_limits<unsigned>::max())
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:296, length = %d\n", length);
         CRASH();
+    }
     return create(string, length);
 }
 
@@ -355,7 +364,10 @@ Ref<StringImpl> StringImpl::convertToLowercaseWithoutLocale()
     }
 
     if (m_length > static_cast<unsigned>(std::numeric_limits<int32_t>::max()))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:369, m_length = %d\n", m_length);
         CRASH();
+    }
     int32_t length = m_length;
 
     // Do a slower implementation for cases that include non-ASCII characters.
@@ -407,7 +419,10 @@ Ref<StringImpl> StringImpl::convertToUppercaseWithoutLocale()
     // the extra time for pre-scanning.
 
     if (m_length > static_cast<unsigned>(std::numeric_limits<int32_t>::max()))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:424, m_length = %d\n", m_length);
         CRASH();
+    }
     int32_t length = m_length;
 
     if (is8Bit()) {
@@ -519,7 +534,10 @@ Ref<StringImpl> StringImpl::convertToLowercaseWithLocale(const AtomicString& loc
     // just like the end of that function.
 
     if (m_length > static_cast<unsigned>(std::numeric_limits<int32_t>::max()))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:539, m_length = %d\n", m_length);
         CRASH();
+    }
     int length = m_length;
 
     // Below, we pass in the hardcoded locale "tr". Passing that is more efficient than
@@ -550,7 +568,10 @@ Ref<StringImpl> StringImpl::convertToUppercaseWithLocale(const AtomicString& loc
         return convertToUppercaseWithoutLocale();
 
     if (m_length > static_cast<unsigned>(std::numeric_limits<int32_t>::max()))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:573, m_length = %d\n", m_length);
         CRASH();
+    }
     int length = m_length;
 
     // Below, we pass in the hardcoded locale "tr". Passing that is more efficient than
@@ -635,7 +656,10 @@ SlowPath:
     }
 
     if (m_length > static_cast<unsigned>(std::numeric_limits<int32_t>::max()))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:660, m_length = %d\n", m_length);
         CRASH();
+    }
 
     auto upconvertedCharacters = StringView(*this).upconvertedCharacters();
 
@@ -913,7 +937,10 @@ size_t StringImpl::find(const LChar* matchString, unsigned index)
         return notFound;
     size_t matchStringLength = strlen(reinterpret_cast<const char*>(matchString));
     if (matchStringLength > std::numeric_limits<unsigned>::max())
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:942, matchStringLength = %d\n", matchStringLength);
         CRASH();
+    }
     unsigned matchLength = matchStringLength;
     if (!matchLength)
         return std::min(index, length());
@@ -1285,7 +1312,10 @@ Ref<StringImpl> StringImpl::replace(unsigned position, unsigned lengthToReplace,
         return *this;
 
     if ((length() - lengthToReplace) >= (std::numeric_limits<unsigned>::max() - lengthToInsert))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:1317, length = %d, lengthToReplace = %d, lengthToInsert = %d\n", length(), lengthToReplace, lengthToInsert);
         CRASH();
+    }
 
     if (is8Bit() && (!string || string->is8Bit())) {
         LChar* data;
@@ -1342,12 +1372,18 @@ Ref<StringImpl> StringImpl::replace(UChar pattern, const LChar* replacement, uns
         return *this;
 
     if (repStrLength && matchCount > std::numeric_limits<unsigned>::max() / repStrLength)
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:1377, repStrLength = %d, matchCount = %d\n", repStrLength, matchCount);
         CRASH();
+    }
 
     unsigned replaceSize = matchCount * repStrLength;
     unsigned newSize = m_length - matchCount;
     if (newSize >= (std::numeric_limits<unsigned>::max() - replaceSize))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:1385, newSize = %d, replaceSize = %d\n", matchSize, replaceSize);
         CRASH();
+    }
 
     newSize += replaceSize;
 
@@ -1418,12 +1454,18 @@ Ref<StringImpl> StringImpl::replace(UChar pattern, const UChar* replacement, uns
         return *this;
 
     if (repStrLength && matchCount > std::numeric_limits<unsigned>::max() / repStrLength)
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:1459, repStrLength = %d, matchCount = %d\n", repStrLength, matchCount);
         CRASH();
+    }
 
     unsigned replaceSize = matchCount * repStrLength;
     unsigned newSize = m_length - matchCount;
     if (newSize >= (std::numeric_limits<unsigned>::max() - replaceSize))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:1467, newSize = %d, replaceSize = %d\n", newSize, replaceSize);
         CRASH();
+    }
 
     newSize += replaceSize;
 
@@ -1503,10 +1545,16 @@ Ref<StringImpl> StringImpl::replace(StringImpl* pattern, StringImpl* replacement
 
     unsigned newSize = m_length - matchCount * patternLength;
     if (repStrLength && matchCount > std::numeric_limits<unsigned>::max() / repStrLength)
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:1550, repStrLength = %d, matchCount = %d\n", repStrLength, matchCount);
         CRASH();
+    }
 
     if (newSize > (std::numeric_limits<unsigned>::max() - matchCount * repStrLength))
+    {
+        fprintf(stderr, "CRASHING from StringImpl.cpp:1556, newSize = %d, matchCount = %d, repStrLength = %d\n", newSize, matchCount, repStrLength);
         CRASH();
+    }
 
     newSize += matchCount * repStrLength;
 

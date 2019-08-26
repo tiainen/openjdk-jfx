@@ -333,7 +333,10 @@ String makeString(StringTypes... strings)
 {
     String result = tryMakeString(strings...);
     if (!result)
+    {
+        fprintf(stderr, "CRASHING from StringConcatenate.h:338\n");
         CRASH();
+    }
     return result;
 }
 

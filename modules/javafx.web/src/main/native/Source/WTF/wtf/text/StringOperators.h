@@ -37,7 +37,10 @@ public:
     {
         String result = tryMakeString(m_string1, m_string2);
         if (!result)
+        {
+            fprintf(stderr, "CRASHING from StringOperators.h:42\n");
             CRASH();
+        }
         return result;
     }
 

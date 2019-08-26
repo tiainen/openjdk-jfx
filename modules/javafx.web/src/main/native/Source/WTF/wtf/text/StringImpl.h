@@ -970,7 +970,10 @@ inline Ref<StringImpl> StringImpl::adopt(Vector<CharacterType, inlineCapacity, O
     if (size_t size = vector.size()) {
         ASSERT(vector.data());
         if (size > std::numeric_limits<unsigned>::max())
+        {
+            fprintf(stderr, "CRASHING from StringImpl.h:975, size = %d\n", size);
             CRASH();
+        }
         return adoptRef(*new StringImpl(vector.releaseBuffer(), size));
     }
     return *empty();

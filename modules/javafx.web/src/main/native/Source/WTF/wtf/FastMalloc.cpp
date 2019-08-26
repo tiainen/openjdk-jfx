@@ -187,7 +187,7 @@ void* fastMalloc(size_t n)
     void* result = malloc(n);
     if (!result)
     {
-        fprintf(stderr, "CRASHING from FastMalloc.cpp:191\n");
+        fprintf(stderr, "CRASHING from FastMalloc.cpp:191, n = %d\n", n);
         CRASH();
     }
 
@@ -205,7 +205,10 @@ void* fastCalloc(size_t n_elements, size_t element_size)
     ASSERT_IS_WITHIN_LIMIT(n_elements * element_size);
     void* result = calloc(n_elements, element_size);
     if (!result)
+    {
+        fprintf(stderr, "CRASHING from FastMalloc.cpp:210, n_elements = %d, element_size = %d\n", n_elements, element_size);
         CRASH();
+    }
 
     return result;
 }
@@ -220,7 +223,10 @@ void* fastRealloc(void* p, size_t n)
     ASSERT_IS_WITHIN_LIMIT(n);
     void* result = realloc(p, n);
     if (!result)
+    {
+        fprintf(stderr, "CRASHING from FastMalloc.cpp:228, n = %d\n", n);
         CRASH();
+    }
     return result;
 }
 
@@ -283,7 +289,10 @@ void* fastCalloc(size_t numElements, size_t elementSize)
     checkedSize *= numElements;
     void* result = fastZeroedMalloc(checkedSize.unsafeGet());
     if (!result)
+    {
+        fprintf(stderr, "CRASHING from FastMalloc.cpp:294, numElements = %d, elementSize = %d\n", numElements, elementSize);
         CRASH();
+    }
     return result;
 }
 
