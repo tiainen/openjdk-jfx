@@ -1381,7 +1381,7 @@ Ref<StringImpl> StringImpl::replace(UChar pattern, const LChar* replacement, uns
     unsigned newSize = m_length - matchCount;
     if (newSize >= (std::numeric_limits<unsigned>::max() - replaceSize))
     {
-        fprintf(stderr, "CRASHING from StringImpl.cpp:1385, newSize = %d, replaceSize = %d\n", matchSize, replaceSize);
+        fprintf(stderr, "CRASHING from StringImpl.cpp:1385, newSize = %d, replaceSize = %d\n", newSize, replaceSize);
         CRASH();
     }
 
