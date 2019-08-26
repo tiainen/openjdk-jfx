@@ -43,13 +43,15 @@
 #define WTF_STRINGTYPEADAPTER_COPIED_WTF_STRING() ((void)0)
 #endif
 
-namespace WTF {
+namespace WTF
+{
 
-template<typename StringType, typename>
+template <typename StringType, typename>
 class StringTypeAdapter;
 
-template<>
-class StringTypeAdapter<char, void> {
+template <>
+class StringTypeAdapter<char, void>
+{
 public:
     StringTypeAdapter(char character)
         : m_character(character)
@@ -59,12 +61,12 @@ public:
     unsigned length() { return 1; }
     bool is8Bit() { return true; }
 
-    void writeTo(LChar* destination) const
+    void writeTo(LChar *destination) const
     {
         *destination = m_character;
     }
 
-    void writeTo(UChar* destination) const
+    void writeTo(UChar *destination) const
     {
         *destination = m_character;
     }
@@ -75,8 +77,9 @@ private:
     char m_character;
 };
 
-template<>
-class StringTypeAdapter<UChar, void> {
+template <>
+class StringTypeAdapter<UChar, void>
+{
 public:
     StringTypeAdapter(UChar character)
         : m_character(character)
@@ -86,13 +89,13 @@ public:
     unsigned length() const { return 1; }
     bool is8Bit() const { return m_character <= 0xff; }
 
-    void writeTo(LChar* destination) const
+    void writeTo(LChar *destination) const
     {
         ASSERT(is8Bit());
         *destination = static_cast<LChar>(m_character);
     }
 
-    void writeTo(UChar* destination) const
+    void writeTo(UChar *destination) const
     {
         *destination = m_character;
     }
@@ -103,13 +106,14 @@ private:
     UChar m_character;
 };
 
-template<>
-class StringTypeAdapter<const LChar*, void> {
+template <>
+class StringTypeAdapter<const LChar *, void>
+{
 public:
-    StringTypeAdapter(const LChar* characters)
+    StringTypeAdapter(const LChar *characters)
         : m_characters(characters)
     {
-        size_t length = strlen(reinterpret_cast<const char*>(characters));
+        size_t length = strlen(reinterpret_cast<const char *>(characters));
         RELEASE_ASSERT(length <= String::MaxLength);
         m_length = static_cast<unsigned>(length);
     }
@@ -117,12 +121,12 @@ public:
     unsigned length() const { return m_length; }
     bool is8Bit() const { return true; }
 
-    void writeTo(LChar* destination) const
+    void writeTo(LChar *destination) const
     {
         StringView(m_characters, m_length).getCharactersWithUpconvert(destination);
     }
 
-    void writeTo(UChar* destination) const
+    void writeTo(UChar *destination) const
     {
         StringView(m_characters, m_length).getCharactersWithUpconvert(destination);
     }
@@ -130,14 +134,15 @@ public:
     String toString() const { return String(m_characters, m_length); }
 
 private:
-    const LChar* m_characters;
+    const LChar *m_characters;
     unsigned m_length;
 };
 
-template<>
-class StringTypeAdapter<const UChar*, void> {
+template <>
+class StringTypeAdapter<const UChar *, void>
+{
 public:
-    StringTypeAdapter(const UChar* characters)
+    StringTypeAdapter(const UChar *characters)
         : m_characters(characters)
     {
         size_t length = 0;
@@ -150,12 +155,12 @@ public:
     unsigned length() const { return m_length; }
     bool is8Bit() const { return false; }
 
-    NO_RETURN_DUE_TO_CRASH void writeTo(LChar*) const
+    NO_RETURN_DUE_TO_CRASH void writeTo(LChar *) const
     {
         CRASH(); // FIXME make this a compile-time failure https://bugs.webkit.org/show_bug.cgi?id=165791
     }
 
-    void writeTo(UChar* destination) const
+    void writeTo(UChar *destination) const
     {
         memcpy(destination, m_characters, m_length * sizeof(UChar));
     }
@@ -163,41 +168,45 @@ public:
     String toString() const { return String(m_characters, m_length); }
 
 private:
-    const UChar* m_characters;
+    const UChar *m_characters;
     unsigned m_length;
 };
 
-template<>
-class StringTypeAdapter<const char*, void> : public StringTypeAdapter<const LChar*, void> {
+template <>
+class StringTypeAdapter<const char *, void> : public StringTypeAdapter<const LChar *, void>
+{
 public:
-    StringTypeAdapter(const char* characters)
-        : StringTypeAdapter<const LChar*, void>(reinterpret_cast<const LChar*>(characters))
+    StringTypeAdapter(const char *characters)
+        : StringTypeAdapter<const LChar *, void>(reinterpret_cast<const LChar *>(characters))
     {
     }
 };
 
-template<>
-class StringTypeAdapter<char*, void> : public StringTypeAdapter<const char*, void> {
+template <>
+class StringTypeAdapter<char *, void> : public StringTypeAdapter<const char *, void>
+{
 public:
-    StringTypeAdapter(const char* characters)
-        : StringTypeAdapter<const char*, void>(characters)
+    StringTypeAdapter(const char *characters)
+        : StringTypeAdapter<const char *, void>(characters)
     {
     }
 };
 
-template<>
-class StringTypeAdapter<ASCIILiteral, void> : public StringTypeAdapter<const char*, void> {
+template <>
+class StringTypeAdapter<ASCIILiteral, void> : public StringTypeAdapter<const char *, void>
+{
 public:
     StringTypeAdapter(ASCIILiteral characters)
-        : StringTypeAdapter<const char*, void>(characters)
+        : StringTypeAdapter<const char *, void>(characters)
     {
     }
 };
 
-template<>
-class StringTypeAdapter<Vector<char>, void> {
+template <>
+class StringTypeAdapter<Vector<char>, void>
+{
 public:
-    StringTypeAdapter(const Vector<char>& vector)
+    StringTypeAdapter(const Vector<char> &vector)
         : m_vector(vector)
     {
     }
@@ -205,26 +214,27 @@ public:
     size_t length() const { return m_vector.size(); }
     bool is8Bit() const { return true; }
 
-    void writeTo(LChar* destination) const
+    void writeTo(LChar *destination) const
     {
-        StringView(reinterpret_cast<const LChar*>(m_vector.data()), m_vector.size()).getCharactersWithUpconvert(destination);
+        StringView(reinterpret_cast<const LChar *>(m_vector.data()), m_vector.size()).getCharactersWithUpconvert(destination);
     }
 
-    void writeTo(UChar* destination) const
+    void writeTo(UChar *destination) const
     {
-        StringView(reinterpret_cast<const LChar*>(m_vector.data()), m_vector.size()).getCharactersWithUpconvert(destination);
+        StringView(reinterpret_cast<const LChar *>(m_vector.data()), m_vector.size()).getCharactersWithUpconvert(destination);
     }
 
     String toString() const { return String(m_vector.data(), m_vector.size()); }
 
 private:
-    const Vector<char>& m_vector;
+    const Vector<char> &m_vector;
 };
 
-template<>
-class StringTypeAdapter<String, void> {
+template <>
+class StringTypeAdapter<String, void>
+{
 public:
-    StringTypeAdapter(const String& string)
+    StringTypeAdapter(const String &string)
         : m_string(string)
     {
     }
@@ -232,13 +242,13 @@ public:
     unsigned length() const { return m_string.length(); }
     bool is8Bit() const { return m_string.isNull() || m_string.is8Bit(); }
 
-    void writeTo(LChar* destination) const
+    void writeTo(LChar *destination) const
     {
         StringView(m_string).getCharactersWithUpconvert(destination);
         WTF_STRINGTYPEADAPTER_COPIED_WTF_STRING();
     }
 
-    void writeTo(UChar* destination) const
+    void writeTo(UChar *destination) const
     {
         StringView(m_string).getCharactersWithUpconvert(destination);
         WTF_STRINGTYPEADAPTER_COPIED_WTF_STRING();
@@ -247,94 +257,114 @@ public:
     String toString() const { return m_string; }
 
 private:
-    const String& m_string;
+    const String &m_string;
 };
 
-template<>
-class StringTypeAdapter<AtomicString, void> : public StringTypeAdapter<String, void> {
+template <>
+class StringTypeAdapter<AtomicString, void> : public StringTypeAdapter<String, void>
+{
 public:
-    StringTypeAdapter(const AtomicString& string)
+    StringTypeAdapter(const AtomicString &string)
         : StringTypeAdapter<String, void>(string.string())
     {
     }
 };
 
-template<typename Adapter>
+template <typename Adapter>
 inline bool are8Bit(Adapter adapter)
 {
     return adapter.is8Bit();
 }
 
-template<typename Adapter, typename... Adapters>
-inline bool are8Bit(Adapter adapter, Adapters ...adapters)
+template <typename Adapter, typename... Adapters>
+inline bool are8Bit(Adapter adapter, Adapters... adapters)
 {
     return adapter.is8Bit() && are8Bit(adapters...);
 }
 
-template<typename ResultType, typename Adapter>
-inline void makeStringAccumulator(ResultType* result, Adapter adapter)
+template <typename ResultType, typename Adapter>
+inline void makeStringAccumulator(ResultType *result, Adapter adapter)
 {
     adapter.writeTo(result);
 }
 
-template<typename ResultType, typename Adapter, typename... Adapters>
-inline void makeStringAccumulator(ResultType* result, Adapter adapter, Adapters ...adapters)
+template <typename ResultType, typename Adapter, typename... Adapters>
+inline void makeStringAccumulator(ResultType *result, Adapter adapter, Adapters... adapters)
 {
     adapter.writeTo(result);
     makeStringAccumulator(result + adapter.length(), adapters...);
 }
 
-template<typename StringTypeAdapter, typename... StringTypeAdapters>
-String tryMakeStringFromAdapters(StringTypeAdapter adapter, StringTypeAdapters ...adapters)
+template <typename StringTypeAdapter, typename... StringTypeAdapters>
+String tryMakeStringFromAdapters(StringTypeAdapter adapter, StringTypeAdapters... adapters)
 {
     static_assert(String::MaxLength == std::numeric_limits<int32_t>::max(), "");
     auto sum = checkedSum<int32_t>(adapter.length(), adapters.length()...);
+    fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 1, sum = %d\n", sum);
     if (sum.hasOverflowed())
+    {
+        fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 2\n");
         return String();
+    }
 
     unsigned length = sum.unsafeGet();
+    fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 3, length = %d\n", length);
     ASSERT(length <= String::MaxLength);
-    if (are8Bit(adapter, adapters...)) {
-        LChar* buffer;
+    if (are8Bit(adapter, adapters...))
+    {
+        fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 4\n");
+        LChar *buffer;
         RefPtr<StringImpl> resultImpl = StringImpl::tryCreateUninitialized(length, buffer);
         if (!resultImpl)
+        {
+            fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 5\n");
             return String();
+        }
 
+        fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 6\n");
         makeStringAccumulator(buffer, adapter, adapters...);
+        fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 7\n");
 
         return WTFMove(resultImpl);
     }
 
-    UChar* buffer;
+    fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 8\n");
+    UChar *buffer;
     RefPtr<StringImpl> resultImpl = StringImpl::tryCreateUninitialized(length, buffer);
+    fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 9\n");
     if (!resultImpl)
+    {
+        fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 10\n");
         return String();
+    }
 
+    fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 11\n");
     makeStringAccumulator(buffer, adapter, adapters...);
+    fprintf(stderr, "[JSY] StringConcatenate::tryMakeStringFromAdapters 12\n");
 
     return WTFMove(resultImpl);
 }
 
-template<typename... StringTypes>
-String tryMakeString(StringTypes ...strings)
+template <typename... StringTypes>
+String tryMakeString(StringTypes... strings)
 {
     return tryMakeStringFromAdapters(StringTypeAdapter<StringTypes>(strings)...);
 }
 
 // Convenience only.
-template<typename StringType>
+template <typename StringType>
 String makeString(StringType string)
 {
     return String(string);
 }
 
-template<typename... StringTypes>
+template <typename... StringTypes>
 String makeString(StringTypes... strings)
 {
     String result = tryMakeString(strings...);
     if (!result)
     {
-        fprintf(stderr, "CRASHING from StringConcatenate.h:338\n");
+        fprintf(stderr, "CRASHING from StringConcatenate.h:368\n");
         CRASH();
     }
     return result;
