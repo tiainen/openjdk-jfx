@@ -57,6 +57,7 @@
 #include <WebCore/HTMLFormElement.h>
 #include <WebCore/InspectorController.h>
 #include <WebCore/KeyboardEvent.h>
+#include <WebCore/loader/cache/MemoryCache.h>
 
 #include <WebCore/NodeTraversal.h>
 #include <WebCore/Page.h>
@@ -2417,6 +2418,12 @@ JNIEXPORT void JNICALL Java_com_sun_webkit_WebPage_twkSetDeveloperExtrasEnabled
     Page* page = WebPage::pageFromJLong(pPage);
     ASSERT(page);
     page->settings().setDeveloperExtrasEnabled(jbool_to_bool(enabled));
+}
+
+JNIEXPORT void JNICALL Java_com_sun_webkit_WebPage_twkClearCache
+  (JNIEnv*, jobject)
+{
+    MemoryCache::singleton().evictResources();
 }
 
 JNIEXPORT jint JNICALL Java_com_sun_webkit_WebPage_twkGetUnloadEventListenersCount

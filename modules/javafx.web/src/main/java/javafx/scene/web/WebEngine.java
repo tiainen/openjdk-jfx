@@ -449,6 +449,14 @@ final public class WebEngine {
     }
 
     //
+    // Cache
+
+    public void clearCache() {
+        checkThread();
+        page.clearCache();
+    }
+
+    //
     // Settings
 
     /**

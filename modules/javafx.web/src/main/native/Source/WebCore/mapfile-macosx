@@ -1673,6 +1673,7 @@
                _Java_com_sun_webkit_WebPage_twkAddJavaScriptBinding
                _Java_com_sun_webkit_WebPage_twkAdjustFrameHeight
                _Java_com_sun_webkit_WebPage_twkBeginPrinting
+               _Java_com_sun_webkit_WebPage_twkClearCache
                _Java_com_sun_webkit_WebPage_twkConnectInspectorFrontend
                _Java_com_sun_webkit_WebPage_twkCopy
                _Java_com_sun_webkit_WebPage_twkCreatePage
